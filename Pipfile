@@ -9,6 +9,7 @@ requests = "*"
 rsa = "*"
 cryptography = "*"
 crypto = "*"
+groq = "*"
 
 [dev-packages]
 
