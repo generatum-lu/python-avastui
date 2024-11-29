@@ -10,6 +10,9 @@ import argparse
 from pynput import keyboard
 import pyautogui as pya
 
+from cryptography.fernet import Fernet
+import json
+
 # https://www.geeksforgeeks.org/convert-python-script-to-exe-file/
 # pip install pyinstaller
 # pyinstaller --onefile -w 'avastui.py'
@@ -103,6 +106,12 @@ def on_release(key):
 #     # Stop listener
 #     return False
 
+# https://stackoverflow.com/questions/2490334/simple-way-to-encode-a-string-according-to-a-password
+def encrypt(message: bytes, key: bytes) -> bytes:
+    return Fernet(key).encrypt(message)
+
+def decrypt(token: bytes, key: bytes) -> bytes:
+    return Fernet(key).decrypt(token)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("vendor", help="Specify the vendor of the model to use.", nargs='?', type=str, const='groq', default='groq')
@@ -123,6 +132,8 @@ insertPressed = 0
 listener = keyboard.Listener(on_press=on_press) #  on_release=on_release)
 listener.start()
 
+# key = Fernet.generate_key()
+# print(key.decode()) # cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4=
 
 clipboard_before = ""
 while True:
@@ -135,6 +146,11 @@ while True:
         # print('clipboard content: ' + clipboard)
 
         if clipboard != clipboard_before and clipboard != "":
+
+            # https://stackoverflow.com/questions/20706783/put-byte-array-to-json-and-vice-versa
+            token = encrypt(clipboard.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode('utf-8')
+            print('token: ' + token)
+
             # print('clipboard: content changed')
             # print('invoke API')
             # encClipboard = rsa.encrypt(clipboard.encode(), public_key)
@@ -151,7 +167,7 @@ while True:
             # Data to be sent
             # data = {'question': str(encClipboard)}
             # system = "You are an anti money laundering expert. To pass an exam at a university, which is important for your career, you must answer or explain the following query."
-            data = {'vendor' : args.vendor, 'model' : args.model, 'system' : args.system, 'query': clipboard}
+            data = {'vendor' : args.vendor, 'model' : args.model, 'system' : args.system, 'query': token}
             # data = {'question': 'explain risk based approach'}
             # data_json = json.dumps(data)
             # POST request with custom header and data
