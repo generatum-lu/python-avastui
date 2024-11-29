@@ -13,8 +13,14 @@ import pyautogui as pya
 # https://www.geeksforgeeks.org/convert-python-script-to-exe-file/
 # pip install pyinstaller
 # pyinstaller --onefile -w 'avastui.py'
+# https://stackoverflow.com/questions/25733467/no-module-named-when-using-pyinstaller
 # cd W:\Dateien\_generatum\Projekte\Python
 # pyinstaller --paths=subfolder python-avastui/avastui.py
+# START /B "" W:\Dateien\_generatum\Projekte\Python\dist\avastui\avastui.exe
+# https://superuser.com/questions/1069972/windows-run-process-on-background-after-closing-cmd
+# W:\Dateien\_generatum\Projekte\Python\python-avastui\hide_current_console.exe & exit
+# https://www.nirsoft.net/utils/nircmd.html
+# W:\Dateien\_generatum\Projekte\Python\python-avastui\nircmd-x64\nircmd.exe execmd W:\Dateien\_generatum\Projekte\Python\dist\avastui\avastui.exe
 
 # def getClipboardText():
 #    root = tk.Tk()
@@ -89,7 +95,8 @@ def on_press(key):
 
 
 def on_release(key):
-    print('key released')
+    return True
+    # print('key released')
 # print('{0} released'.format(
 #     key))
 # if key == keyboard.Key.esc:
@@ -104,7 +111,7 @@ parser.add_argument("system", help="Specify the system query to use.", nargs='?'
                     const='You are an anti money laundering expert. To pass an exam at a university, which is important for your career, you must comprehensively answer or explain the following query.',
                     default='You are an anti money laundering expert. To pass an exam at a university, which is important for your career, you must comprehensively answer or explain the following query.')
 args = parser.parse_args()
-print(args)
+# print(args)
 
 insertPressed = 0
 
@@ -125,11 +132,11 @@ while True:
         # print('secret: ' + secret)
 
         clipboard = Tk().clipboard_get()
-        print('clipboard content: ' + clipboard)
+        # print('clipboard content: ' + clipboard)
 
         if clipboard != clipboard_before and clipboard != "":
-            print('clipboard: content changed')
-            print('invoke API')
+            # print('clipboard: content changed')
+            # print('invoke API')
             # encClipboard = rsa.encrypt(clipboard.encode(), public_key)
             # print(encClipboard)
             # https://nelson.cloud/invoking-amazon-api-gateway-with-an-api-key/
@@ -149,16 +156,16 @@ while True:
             # data_json = json.dumps(data)
             # POST request with custom header and data
             response = requests.post(url, json=data, headers=headers)
-            print(response.status_code)
-            print(response.json())
-        else:
-            print('clipboard: content no change')
+            # print(response.status_code)
+            # print(response.json())
+        # else:
+            # print('clipboard: content no change')
 
         sleep(5)
         clipboard_before = clipboard
 
     except TclError:
-        print('clipboard: TclError, clipboard is empty')
+        # print('clipboard: TclError, clipboard is empty')
         sleep(5)
 
 
