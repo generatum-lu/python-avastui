@@ -10,6 +10,7 @@ rsa = "*"
 cryptography = "*"
 crypto = "*"
 groq = "*"
+pyautogui = "*"
 
 [dev-packages]
 

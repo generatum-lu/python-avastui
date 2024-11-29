@@ -3,11 +3,18 @@
 from tkinter import Tk, TclError
 from time import sleep
 import requests
-import rsa
-import json
-
+# import rsa
+# import json
+import argparse
 
 from pynput import keyboard
+import pyautogui as pya
+
+# https://www.geeksforgeeks.org/convert-python-script-to-exe-file/
+# pip install pyinstaller
+# pyinstaller --onefile -w 'avastui.py'
+# cd W:\Dateien\_generatum\Projekte\Python
+# pyinstaller --paths=subfolder python-avastui/avastui.py
 
 # def getClipboardText():
 #    root = tk.Tk()
@@ -61,6 +68,54 @@ from pynput import keyboard
 # response = requests.get(url, headers=headers)
 # print(response.json())
 
+def on_press(key):
+    # try:
+    #     print('alphanumeric key {0} pressed'.format(
+    #         key.char))
+    # except AttributeError:
+    #     print('special key {0} pressed'.format(
+    #         key))
+    global insertPressed
+    if key == keyboard.Key.insert:
+        insertPressed += 1
+        if insertPressed == 2:
+            insertPressed = 0
+            # root = Tk()
+            # root.withdraw()
+            # root.clipboard_clear()
+            # root.clipboard_append(str(insertPressed))
+            # root.update()
+            pya.hotkey("ctrl", "c") # copy the text (simulating key strokes)
+
+
+def on_release(key):
+    print('key released')
+# print('{0} released'.format(
+#     key))
+# if key == keyboard.Key.esc:
+#     # Stop listener
+#     return False
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("vendor", help="Specify the vendor of the model to use.", nargs='?', type=str, const='groq', default='groq')
+parser.add_argument("model", help="Specify the model to use.", nargs='?', type=str, const='llama-3.1-70b-versatile', default='llama-3.1-70b-versatile')
+parser.add_argument("system", help="Specify the system query to use.", nargs='?', type=str,
+                    const='You are an anti money laundering expert. To pass an exam at a university, which is important for your career, you must comprehensively answer or explain the following query.',
+                    default='You are an anti money laundering expert. To pass an exam at a university, which is important for your career, you must comprehensively answer or explain the following query.')
+args = parser.parse_args()
+print(args)
+
+insertPressed = 0
+
+# Collect events until released
+# with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
+#   listener.join()
+
+# ...or, in a non-blocking fashion:
+listener = keyboard.Listener(on_press=on_press) #  on_release=on_release)
+listener.start()
+
 
 clipboard_before = ""
 while True:
@@ -88,8 +143,9 @@ while True:
             headers = {"Content-Type" : "application/json", headerAuthKey : headerAuthValue}
             # Data to be sent
             # data = {'question': str(encClipboard)}
-            # data = {'question': clipboard}
-            data = {'question': 'explain risk based approach'}
+            # system = "You are an anti money laundering expert. To pass an exam at a university, which is important for your career, you must answer or explain the following query."
+            data = {'vendor' : args.vendor, 'model' : args.model, 'system' : args.system, 'query': clipboard}
+            # data = {'question': 'explain risk based approach'}
             # data_json = json.dumps(data)
             # POST request with custom header and data
             response = requests.post(url, json=data, headers=headers)
@@ -104,6 +160,7 @@ while True:
     except TclError:
         print('clipboard: TclError, clipboard is empty')
         sleep(5)
+
 
 
 
