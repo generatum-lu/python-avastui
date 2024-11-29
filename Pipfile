@@ -11,6 +11,7 @@ cryptography = "*"
 crypto = "*"
 groq = "*"
 pyautogui = "*"
+pywin32 = "*"
 
 [dev-packages]
 

