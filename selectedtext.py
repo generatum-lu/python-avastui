@@ -1,12 +1,12 @@
 # https://stackoverflow.com/questions/1007185/how-to-retrieve-the-selected-text-from-the-active-window
-
+import array
 import ctypes as ct
 from ctypes import wintypes as wt
 from time import sleep
 
 #import win32gui
-import pywin32
-import win32api
+# import pywin32
+# import win32api
 #import win32con
 
 import win32gui as wgui
@@ -14,6 +14,9 @@ import win32process as wproc
 import win32con as wcon
 
 import sys
+
+from win32api import HIWORD, LOWORD
+
 
 class GUITHREADINFO(ct.Structure):
     _fields_ = [
@@ -40,11 +43,10 @@ class GUITHREADINFO(ct.Structure):
         ret += (start_format + "({1:d}, {2:d}, {3:d}, {4:d})").format(self. _fields_[-1][0], rc_caret.top, rc_caret.left, rc_caret.right, rc_caret.bottom)
         return ret
 
-def get_selected_text_from_front_window(*argv): # As String
-    '''
-    vb6 to python translation
-    '''
-    print('get_selected_text_from_front_window')
+#def get_selected_text_from_front_window(*argv): # As String
+def get_selected_text_from_front_window(): # As String
+
+    #print('get_selected_text_from_front_window')
     # GUITHREADINFO
     # Enthält Informationen zu einem GUI-Thread.
     #gui = GUITHREADINFO(cbSize=sizeof(GUITHREADINFO))
@@ -65,9 +67,9 @@ def get_selected_text_from_front_window(*argv): # As String
     gti.cbSize = ct.sizeof(GUITHREADINFO)
     # res = GetGUIThreadInfo(tid, ct.byref(gti))
     res = GetGUIThreadInfo(0, ct.byref(gti))
-    print("{0:s} returned: {1:d}".format(GetGUIThreadInfo.__name__, res))
-    if res:
-        print(gti)
+    #print("{0:s} returned: {1:d}".format(GetGUIThreadInfo.__name__, res))
+    #if res:
+    #    print(gti)
 
     #print('gui.cbSize: ' + str(gti.cbSize))
     #print('res: ' + str(res))
@@ -100,9 +102,13 @@ def get_selected_text_from_front_window(*argv): # As String
     # Typ: HWND
     # Ein Handle für das Fenster, das das Caret anzeigt.
 
+    # txt = "Mein Test Text"
     txt = GetCaretWindowText(gti.hwndCaret, True)
+    # print('hier')
     # txt = GetCaretWindowText(gti.hwndFocus, True)
-    print('txt: ' + str(txt))
+    #print('txt: ' + str(txt))
+
+    #del gti
 
     '''
     if Txt = "" Then
@@ -118,6 +124,7 @@ def get_selected_text_from_front_window(*argv): # As String
     End If
     '''
 
+    #print('returning text.........')
     return txt
 
 
@@ -126,34 +133,85 @@ def GetCaretWindowText(hWndCaret, Selected = False): # As String
     #print('GetCaretWindowText')
     #print('hWndCaret: ' + str(hWndCaret))
     #print('Selected: ' + str(Selected))
-    startpos =0
-    endpos =0
 
-    txt = ""
+    buf_size = 0
+    text = ""
+    #startpos =0
+    #endpos =0
+
+    # https://www.programcreek.com/python/example/115374/win32con.WM_GETTEXT
+    # buffer_len = SendMessage(hwnd, WM_GETTEXTLENGTH, 0, 0) + 1
+    # buffer = array.array('b', b'\x00\x00' * buffer_len)
+    # text_len = SendMessage(hwnd, WM_GETTEXT, buffer_len, buffer)
+    # text = PyGetString(buffer.buffer_info()[0], buffer_len - 1)
+    # return text
 
     if hWndCaret:
         #print('hWndCaret')
-        buf_size = 1 + wgui.SendMessage(hWndCaret, wcon.WM_GETTEXTLENGTH, 0, 0)
-        #if buf_size:
-        #    #print('buf_size')
-        #    buffer = wgui.PyMakeBuffer(buf_size)
-        #    wgui.SendMessage(hWndCaret, wcon.WM_GETTEXT, buf_size, buffer)
-        #    txt = buffer[:buf_size]
-        #    #print('text: ' + str(txt))
+        buf_size = wgui.SendMessage(hWndCaret, wcon.WM_GETTEXTLENGTH, 0, 0) + 1
+        #buf_size = wgui.SendMessage(hWndCaret, wcon.WM_GETTEXTLENGTH, 0, 0) + 2
+        #buf_size = wgui.SendMessage(hWndCaret, wcon.WM_GETTEXTLENGTH, 0, 0) * 2 + 2
+        #print('buf_size: ' + str(buf_size))
+        if buf_size:
+            #print('buf_size...')
+            # https://stackoverflow.com/questions/53182704/python-memorybuffer-pywin32
+            #try:
+                # print('wgui.PyMakeBuffer(buf_size)...')
+                # buffer = wgui.PyMakeBuffer(buf_size)      # hier ist der Fehler: (0xC0000005) ein Programm versucht, auf einen Speicherbereich zuzugreifen, der nicht für es reserviert ist
+            #print("array.array('b', b'\x00\x00' * buf_size)")
+            buffer = array.array('b', b'\x00\x00' * buf_size)
+                #except ValueError:
+                #    print('error: wgui.PyMakeBuffer(buf_size)')
+                #    return
+            #print('buffer: ' + str(buffer))
+            text_len = wgui.SendMessage(hWndCaret, wcon.WM_GETTEXT, buf_size, buffer)
+            #text = buffer[:buf_size]
+            #print('text: ' + str(text))
+            #try:
+            #    address, length = wgui.PyGetBufferAddressAndLen(buffer)
+            #except ValueError:
+            #    print('error: wgui.PyGetBufferAddressAndLen(buffer)')
+            #    return
+            #text = wgui.PyGetString(address, length)
+            #text = wgui.PyGetString(buffer.buffer_info()[0], buf_size - 1)
+            text = wgui.PyGetString(buffer.buffer_info()[0], text_len)
+            #split_text = text.split("\r\n")
+            #print('split_text: ' + str(split_text))
+            #clean_text = "".join(split_text)
+            #print('clean_text: ' + clean_text)
+            #print('###########################################################')
+            #buffer.release()
+            #del buffer
+            #address.release()
+            #del address
+            #length.release()
+            #del length
+            #print('returning text...')   # dann folgt: 0xC0000374 Code 0xC0000374 is STATUS_HEAP_CORRUPTION (A heap has been corrupted.)
+                                         # The "heap" is just where most programs keep all of their data. A "heap corruption" means that some memory in the heap doesn't make any sense. This is almost certainly an indication of a bug in the program's code,
+            # return text
+
 
         if Selected and buf_size:
             #print('selected and buf_size')
+            #print('startpos: ' + str(startpos))
+            #print('endpos: ' + str(endpos))
             selinfo  = wgui.SendMessage(hWndCaret, wcon.EM_GETSEL, 0, 0)
-            endpos   = win32api.HIWORD(selinfo)
-            endpos   = pywin32.HIWORD(selinfo)
+            #print('selinfo: ' + str(selinfo))
+            #endpos   = win32api.HIWORD(selinfo)
+            #endpos   = pywin32.HIWORD(selinfo)
             endpos   = HIWORD(selinfo)
-            startpos = win32api.LOWORD(selinfo)
-            startpos = pywin32.LOWORD(selinfo)
+            #startpos = win32api.LOWORD(selinfo)
+            #startpos = pywin32.LOWORD(selinfo)
             startpos = LOWORD(selinfo)
-            return txt[startpos: endpos]
+            #print('startpos: ' + str(startpos))
+            #print('endpos: ' + str(endpos))
+            rn = text[startpos:endpos].count("\r\n")
+            #print('rn: ' + str(r))
+            #print('text[startpos:endpos]:' + (text[startpos:endpos+rn]))
+            return text[startpos:endpos+rn]
 
-    #print('text: ' + str(txt))
-    return txt
+    #print('returning text......')
+    return text
 
 #if __name__ == '__main__':
 #    while True:
@@ -165,10 +223,14 @@ def GetCaretWindowText(hWndCaret, Selected = False): # As String
 
 if __name__ == "__main__":
     while True:
-        print("Python {0:s} {1:d}bit on {2:s}".format(" ".join(item.strip() for item in sys.version.split("\n")), 64 if sys.maxsize > 0x100000000 else 32, sys.platform))
-        get_selected_text_from_front_window(*sys.argv[1:])
-        print("Done.\n")
-        sleep(5)
+        #print("Python {0:s} {1:d}bit on {2:s}".format(" ".join(item.strip() for item in sys.version.split("\n")), 64 if sys.maxsize > 0x100000000 else 32, sys.platform))
+        #print('Beginn')
+        #get_selected_text_from_front_window(*sys.argv[1:])
+        mySelectedText = get_selected_text_from_front_window()
+        print('mySelectedText: ' + mySelectedText)
+        sleep(1)
+        #print('Ende')
+
 
     #//Get the text from the active window into the stringbuilder
     #SendMessage(focused, WM_GETTEXT, builder.Capacity, builder);
