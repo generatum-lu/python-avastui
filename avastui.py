@@ -119,7 +119,7 @@ def on_press(key):
                 root.withdraw()
                 root.clipboard_clear()
                 keyboardString = str(keyboardString).replace("'", "").replace("Key.space", " ").replace("Key.shift_r", "").replace("Key.shift_l", "").replace("Key.insert", "")
-                print('keyboardString: ' + keyboardString)
+                #print('keyboardString: ' + keyboardString)
                 root.clipboard_append(str(keyboardString))
                 root.update()
                 keyboardString = ""
