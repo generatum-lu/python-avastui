@@ -1,6 +1,6 @@
 # import secrets
 # import string
-from tkinter import Tk, TclError
+##from tkinter import Tk, TclError
 from time import sleep
 import requests
 # import rsa
@@ -92,6 +92,7 @@ def on_press(key):
     global insertPressed
     global start
     global keyboardString
+    global strInvokeApi
     if insertPressed == 1:
         if key == keyboard.Key.backspace:
             #print('backspace')
@@ -108,20 +109,23 @@ def on_press(key):
             stop = time.perf_counter()
             if stop - start < 1:
                 #pya.hotkey("ctrl", "c") # copy the text (simulating key strokes)
-                root = Tk()
-                root.withdraw()
-                root.clipboard_clear()
-                root.clipboard_append(str(get_selected_text_from_front_window()))
-                root.update()
+                ##root = Tk()
+                ##root.withdraw()
+                ##root.clipboard_clear()
+                ##root.clipboard_append(str(get_selected_text_from_front_window()))
+                ##root.update()
+                strInvokeApi = str(get_selected_text_from_front_window())
+                keyboardString = ""
                 insertPressed = 0
             if stop - start > 1:
-                root = Tk()
-                root.withdraw()
-                root.clipboard_clear()
+                ##root = Tk()
+                ##root.withdraw()
+                ##root.clipboard_clear()
                 keyboardString = str(keyboardString).replace("'", "").replace("Key.space", " ").replace("Key.shift_r", "").replace("Key.shift_l", "").replace("Key.insert", "")
+                strInvokeApi = keyboardString
                 #print('keyboardString: ' + keyboardString)
-                root.clipboard_append(str(keyboardString))
-                root.update()
+                ##root.clipboard_append(str(keyboardString))
+                ##root.update()
                 keyboardString = ""
                 insertPressed = 0
 
@@ -152,7 +156,7 @@ args = parser.parse_args()
 insertPressed = 0
 start = time.perf_counter()
 keyboardString = ""
-
+strInvokeApi = ""
 
 # Collect events until released
 # with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
@@ -165,20 +169,22 @@ listener.start()
 # key = Fernet.generate_key()
 # print(key.decode()) # cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4=
 
-clipboard_before = ""
+##clipboard_before = ""
 while True:
     try:
 
         # secret = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(10))
         # print('secret: ' + secret)
 
-        clipboard = Tk().clipboard_get()
+        ##clipboard = Tk().clipboard_get()
         # print('clipboard content: ' + clipboard)
 
-        if clipboard != clipboard_before and clipboard != "":
+        ##if clipboard != clipboard_before and clipboard != "":
+        if strInvokeApi != "": # Tastatureingabe beendet
 
             # https://stackoverflow.com/questions/20706783/put-byte-array-to-json-and-vice-versa
-            token = encrypt(clipboard.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode()
+            ##token = encrypt(clipboard.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode()
+            token = encrypt(strInvokeApi.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode()
             # print('token: ' + token)
 
             # print('clipboard: content changed')
@@ -204,13 +210,15 @@ while True:
             response = requests.post(url, json=data, headers=headers)
             # print(response.status_code)
             # print(response.json())
+            strInvokeApi = ""
         # else:
             # print('clipboard: content no change')
 
         sleep(5)
-        clipboard_before = clipboard
+        ##clipboard_before = clipboard
 
-    except TclError:
+    #except TclError:
+    except:
         # print('clipboard: TclError, clipboard is empty')
         sleep(5)
 
