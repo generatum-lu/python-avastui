@@ -203,13 +203,13 @@ while True:
             # Data to be sent
             # data = {'question': str(encClipboard)}
             # system = "You are an anti money laundering expert. To pass an exam at a university, which is important for your career, you must answer or explain the following query."
-            data = {'vendor' : args.vendor, 'model' : args.model, 'system' : args.system, 'query': token, 'encrypted': 'yes'}
+            data = {'vendor' : args.vendor, 'model' : args.model, 'system' : args.system, 'query': token, 'encrypted': 'yes', 'output': 'indirect'}
             # data = {'question': 'explain risk based approach'}
             # data_json = json.dumps(data)
             # POST request with custom header and data
             response = requests.post(url, json=data, headers=headers)
             # print(response.status_code)
-            # print(response.json())
+            print(response.json())
             strInvokeApi = ""
         # else:
             # print('clipboard: content no change')
