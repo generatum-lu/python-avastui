@@ -205,10 +205,16 @@ def GetCaretWindowText(hWndCaret, Selected = False): # As String
             startpos = LOWORD(selinfo)
             #print('startpos: ' + str(startpos))
             #print('endpos: ' + str(endpos))
-            rn = text[startpos:endpos].count("\r\n")
-            #print('rn: ' + str(r))
-            #print('text[startpos:endpos]:' + (text[startpos:endpos+rn]))
-            return text[startpos:endpos+rn]
+            rn1 = text[0:endpos].count("\r\n")
+            rn2 = text[startpos:endpos].count("\r\n")
+            #print('rn1: ' + str(rn1))
+            #print('rn2: ' + str(rn2))
+            # print('text[startpos:endpos]:' + (text[startpos+rn:endpos+rn]))
+            if rn1 == rn2:
+                text = text[startpos:endpos+rn2]
+            elif rn1 != rn2:
+                text = text[startpos+rn1:endpos+rn1+rn2]
+            return text
 
     #print('returning text......')
     return text

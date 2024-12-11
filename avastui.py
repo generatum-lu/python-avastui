@@ -184,6 +184,7 @@ while True:
 
             # https://stackoverflow.com/questions/20706783/put-byte-array-to-json-and-vice-versa
             ##token = encrypt(clipboard.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode()
+            print('strInvokeApi: ' + strInvokeApi)
             token = encrypt(strInvokeApi.encode(), 'cNkXmbsNUoAyyLx9bR8HMcj_5JaDNq42Bz_YDXcf3t4='.encode()).decode()
             # print('token: ' + token)
 
